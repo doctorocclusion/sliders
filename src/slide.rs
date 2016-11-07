@@ -1,26 +1,26 @@
 pub use std::iter::{Iterator, Take};
 
 pub struct SlideIter {
-    next_i: usize,
-    n: usize
+    next_i: u64,
+    n: u64
 }
 
 impl SlideIter {
-    pub fn new(i: usize, n: usize) -> SlideIter {
+    pub fn new(i: u64, n: u64) -> SlideIter {
         SlideIter {
             next_i: i, 
             n: n
         }
     }
 
-    pub fn next_i(&mut self) -> usize {
+    pub fn next_i(&mut self) -> u64 {
         let out = self.next_i;
         self.next_i = if self.next_i % 2 == 0 { self.next_i / 2 }
                       else { self.n - (self.next_i + 1) / 2 };
         out
     }
 
-    pub fn get_deck_size(&self) -> usize { self.n }
+    pub fn get_deck_size(&self) -> u64 { self.n }
 
     pub fn reverse(self) -> SlideBackIter { 
         let mut out = SlideBackIter::new(self.next_i, self.n);
@@ -30,32 +30,32 @@ impl SlideIter {
 }
 
 impl Iterator for SlideIter {
-    type Item = usize;
+    type Item = u64;
 
-    fn next(&mut self) -> Option<usize> { Some(self.next_i()) }
+    fn next(&mut self) -> Option<u64> { Some(self.next_i()) }
 }
 
 pub struct SlideBackIter {
-    next_i: usize,
-    n: usize
+    next_i: u64,
+    n: u64
 }
 
 impl SlideBackIter {
-    pub fn new(i: usize, n: usize) -> SlideBackIter {
+    pub fn new(i: u64, n: u64) -> SlideBackIter {
         SlideBackIter {
             next_i: i, 
             n: n
         }
     }
 
-    pub fn prev_i(&mut self) -> usize {
+    pub fn prev_i(&mut self) -> u64 {
         let out = self.next_i;
         self.next_i = if self.next_i < (self.n + 1) / 2 { self.next_i * 2 }
                       else { (self.n - self.next_i)  * 2 - 1 };
         out
     }
 
-    pub fn get_deck_size(&self) -> usize { self.n }
+    pub fn get_deck_size(&self) -> u64 { self.n }
 
     pub fn reverse(self) -> SlideIter { 
         let mut out = SlideIter::new(self.next_i, self.n);
@@ -65,19 +65,19 @@ impl SlideBackIter {
 }
 
 impl Iterator for SlideBackIter {
-    type Item = usize;
+    type Item = u64;
 
-    fn next(&mut self) -> Option<usize> { Some(self.prev_i()) }
+    fn next(&mut self) -> Option<u64> { Some(self.prev_i()) }
 }
 
 pub struct Cycle {
-    start: usize,
-    order: usize,
-    deck_size: usize
+    start: u64,
+    order: u64,
+    deck_size: u64
 }
 
 impl Cycle {
-    pub fn new(n: usize, lowest: usize, order: usize) -> Cycle { 
+    pub fn new(n: u64, lowest: u64, order: u64) -> Cycle { 
         Cycle { 
             start: lowest, 
             order: order, 
@@ -87,14 +87,14 @@ impl Cycle {
 
     pub fn iter(&self) -> SlideIter { SlideIter::new(self.start, self.deck_size) }
     pub fn iter_back(&self) -> SlideBackIter { SlideBackIter::new(self.start, self.deck_size) }
-    pub fn iter_once(&self) -> Take<SlideIter> { self.iter().take(self.order) }
-    pub fn iter_back_once(&self) -> Take<SlideBackIter> { self.iter_back().take(self.order) }
-    pub fn get_order(&self) -> usize { self.order }
-    pub fn get_lowest(&self) -> usize { self.start }
-    pub fn get_deck_size(&self) -> usize { self.deck_size }
+    pub fn iter_once(&self) -> Take<SlideIter> { self.iter().take(self.order as usize) }
+    pub fn iter_back_once(&self) -> Take<SlideBackIter> { self.iter_back().take(self.order as usize) }
+    pub fn get_order(&self) -> u64 { self.order }
+    pub fn get_lowest(&self) -> u64 { self.start }
+    pub fn get_deck_size(&self) -> u64 { self.deck_size }
 }
 
-pub fn get_cycles(n: usize) -> Vec<Cycle> {
+pub fn get_cycles(n: u64) -> Vec<Cycle> {
     if n == 0 { return vec![]; }
 
     // list of finished cycles
@@ -113,7 +113,7 @@ pub fn get_cycles(n: usize) -> Vec<Cycle> {
         let start = start * 2 + 1;
         let mut i = start;
 
-        let mut count = 0 as usize;
+        let mut count = 0 as u64;
 
         loop {
             // i is guaranteed to be odd, permute as such
@@ -121,7 +121,7 @@ pub fn get_cycles(n: usize) -> Vec<Cycle> {
             count += 1;
 
             // how many times can i be divided by 2?
-            let tz = i.trailing_zeros() as usize;
+            let tz = i.trailing_zeros() as u64;
 
             i >>= tz; // divide i by 2 until odd
             count += tz; // each one of these divisions is a further step in the cycle
